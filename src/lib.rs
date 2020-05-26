@@ -242,7 +242,10 @@ where
         data: &[u16],
     ) -> Result<(), IFACE::Error> {
         self.set_window(x0, y0, x1, y1)?;
-        self.write_iter(data.iter().cloned())
+        let u8_slice: &[u8] = unsafe {
+            core::slice::from_raw_parts(data.as_ptr().cast::<u8>(), data.len() * 2)
+        };
+        self.interface.write(Command::MemoryWrite as u8, u8_slice)
     }
 
     /// Change the orientation of the screen
